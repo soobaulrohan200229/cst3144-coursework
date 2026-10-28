@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After-School Lessons</title>
+    <!-- Load Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Font Awesome icons (for the cart icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            max-width: 600px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            color: #1f3a5f;
+            margin: 0;
+        }
+        /* The card that holds the lesson / cart */
+        .card {
+            max-width: 350px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        /* Image size is controlled here in CSS (not in the Vue data) */
+        .card img {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .card h2 {
+            color: #1f3a5f;
+            margin-bottom: 5px;
+        }
+        .price {
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 18px;
+        }
+        button {
+            background-color: #1f3a5f;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        /* Grey look when a button is disabled */
+        button:disabled {
+            background-color: #b0b7c3;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <h1>{{ siteName }}</h1>
+
+            <!-- TASK 5: Checkout button.
+                 Shows how many items are in the cart.
+                 Only enabled when there is at least 1 item in the cart. -->
+            <button v-on:click="toggleCart" v-bind:disabled="numberOfItems === 0">
+                <i class="fa fa-shopping-cart"></i>
+                Checkout ({{ numberOfItems }})
+            </button>
+        </header>
+
+        <!-- TASK 5: v-if shows the lesson when displayCart is false -->
+        <div class="card" v-if="!displayCart">
+            <!-- v-bind:src and v-bind:alt read the image path and alt text from data -->
+            <img v-bind:src="lesson.image" v-bind:alt="lesson.alt">
+
+            <h2>{{ lesson.subject }}</h2>
+            <p>Location: {{ lesson.location }}</p>
+            <p class="price">Price: £{{ lesson.price }}</p>
+            <p>Spaces left: {{ lesson.availability }}</p>
+
+            <!-- TASK 4: Add to cart button.
+                 v-on:click runs addToCart.
+                 It is always visible but disabled when there are no spaces left. -->
+            <button v-on:click="addToCart" v-bind:disabled="!canAddToCart">
+                Add to cart
+            </button>
+        </div>
+
+        <!-- TASK 5: v-else shows the checkout page when displayCart is true -->
+        <div class="card" v-else>
+            <h2>Checkout</h2>
+            <p>You have {{ numberOfItems }} item(s) in your cart.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createApp } = Vue
+
+        const myApp = createApp({
+            data() {
+                return {
+                    siteName: "After-School Lessons",
+
+                    // All lesson information is stored here in the data
+                    lesson: {
+                        id: 1001,                                   // TASK 4: lesson ID
+                        subject: "Computer Science",
+                        location: "Hendon",
+                        price: 100,
+                        availability: 5,                            // TASK 4: spaces left
+                        image: "images/computer-science.svg",       // image file path
+                        alt: "A computer screen showing some code"  // image alt text
+                    },
+
+                    cart: [],             // TASK 4: stores the IDs of lessons added
+                    displayCart: false    // TASK 5: false = show lesson, true = show checkout
+                }
+            },
+
+            computed: {
+                // TASK 4: true only when there are spaces left
+                canAddToCart() {
+                    return this.lesson.availability > 0
+                },
+                // TASK 5: number of items in the cart
+                numberOfItems() {
+                    return this.cart.length
+                }
+            },
+
+            methods: {
+                // TASK 4: add the lesson ID to the cart and take one space away
+                addToCart() {
+                    if (this.canAddToCart) {
+                        this.cart.push(this.lesson.id)
+                        this.lesson.availability--
+                    }
+                },
+                // TASK 5: switch between the lesson page and the checkout page
+                toggleCart() {
+                    this.displayCart = !this.displayCart
+                }
+            }
+        })
+
+        myApp.mount('#app')
+    </script>
+
+</body>
+</html>
